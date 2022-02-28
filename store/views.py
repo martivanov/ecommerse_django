@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Product
+from .models import Product, ProductGallery
 from category.models import Category
 from carts.models import CartItem
 from carts.views import _cart_id
@@ -42,9 +42,13 @@ def product_detail(request, category_slug, product_slug):
     except Exception as e:
         raise e
 
+
+    # Get the product gallery
+    product_gallery = ProductGallery.objects.filter(product_id=single_product.id)
     context = {
         'single_product': single_product,
         'in_cart':        in_cart,
+        'product_gallery': product_gallery,
     }
     return render(request, 'store/product_detail.html', context)
 
@@ -54,8 +58,12 @@ def search(request):#search bar
         if keyword:
             products = Product.objects.order_by('-created_date').filter(Q(description__icontains=keyword) | Q(product_name__icontains=keyword))
             product_count = products.count()
+
+    # Get product gallery
+    product_gallery = ProductGallery.objects.filter(product_id=single_product.id)
     context = {
     'products': products,
     'product_count': product_count,
+    'product_gallery': product_gallery,
     }
     return render(request, 'store/store.html', context)
